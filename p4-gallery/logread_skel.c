@@ -19,6 +19,7 @@
 int main(int argc, char *argv[]) {
   int   opt,len;
   char  *logpath = NULL;
+  /* hello world */
 
 
   while ((opt = getopt(argc, argv, "K:PSRE:G:VT")) != -1) {
