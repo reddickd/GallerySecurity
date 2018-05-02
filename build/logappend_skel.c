@@ -23,6 +23,7 @@ int parse_cmdline(int argc, char *argv[]) {
 	int opt = -1;
 	int is_good = -1;
 	int arg_count = 2;
+	int isEmp = 0;
 	char  *logpath = NULL;
 	char *token;
 	char *name;
@@ -48,9 +49,9 @@ int parse_cmdline(int argc, char *argv[]) {
 
       case 'K':
         //secret token
-        // token = malloc(strlen(argv[arg_count]));
-        // token = argv[arg_count];
-        // arg_count += 2;
+        token = malloc(sizeof(char*)*strlen(argv[arg_count]));
+        token = argv[arg_count];
+        arg_count += 2;
         break;
         //should always be next argument after K
 
@@ -64,16 +65,17 @@ int parse_cmdline(int argc, char *argv[]) {
 
       case 'E':
         //employee name
-        // name = malloc(strlen(argv[arg_count]));
-        // name = argv[arg_count];
-        // arg_count += 2;
+        name = malloc(sizeof(char*)*strlen(argv[arg_count]));
+        name = argv[arg_count];
+        arg_count += 2;
+        isEmp = 1;
         break;
 
       case 'G':
         //guest name
-        // name = malloc(strlen(argv[arg_count]));
-        // name = argv[arg_count];
-        // arg_count += 2;
+        name = malloc(sizeof(char*)*strlen(argv[arg_count]));
+        name = argv[arg_count];
+        arg_count += 2;
         break;
 
       case 'R':
@@ -98,7 +100,17 @@ int parse_cmdline(int argc, char *argv[]) {
 
 
   log = fopen(logpath, "a");
-  fwrite(timestamp,1,sizeof(char),log);
+  fwrite("T: ",1,3,log);
+  fwrite(timestamp,1,strlen(timestamp),log);
+  fwrite(" Token: ",1,8,log);
+  fwrite(token,1,strlen(token),log);
+  fwrite(" Name: ",1,7,log);
+  fwrite(name,1,strlen(name),log);
+  if(isEmp == 1){
+  	fwrite(" E: ",1,4,log);
+  }else{
+  	fwrite(" G: ",1,4,log);
+  }
   fclose(log);
 
 
