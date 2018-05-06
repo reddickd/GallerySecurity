@@ -16,6 +16,8 @@
 
 //parse all of the information about the command into variables, store that 
 //into text log file
+//figure out how to manage making sure someone first enters gallery before any rooms,
+//and how to make sure someone leaves 
 
 int parse_cmdline(int argc, char *argv[]) {
 
@@ -28,10 +30,14 @@ int parse_cmdline(int argc, char *argv[]) {
 	char *token;
 	char *name;
 	char *timestamp;
-	char *arrival;
+	char *arrival = NULL;
+	char *departure = NULL;
 	char *room;
  
-  //char a_l_status[1] = ' '; 
+  	//logappend -T 1 -K token -A -E Fred log
+	//logappend -T 2 -K token -A -E Fred -R 1 log
+	//logappend -T 3 -K token -L -E Fred -R 1 log
+	//logappend -T 4 -K token -L -E Fred log
 
 
   //pick up the switches
@@ -57,10 +63,17 @@ int parse_cmdline(int argc, char *argv[]) {
 
       case 'A':
         //arrival
+      	arrival = malloc(sizeof(char*)*strlen(argv[arg_count]));
+        arrival = argv[arg_count];
+        arg_count++;
         break;
 
       case 'L':
         //departure
+      	//has to leave room before gallery
+      	departure = malloc(sizeof(char*)*strlen(argv[arg_count]));
+        departure = argv[arg_count];
+        arg_count++;
         break;
 
       case 'E':
@@ -80,9 +93,12 @@ int parse_cmdline(int argc, char *argv[]) {
 
       case 'R':
         //room ID
-  		//room = malloc(strlen(argv[arg_count]));
-  		//room = argv[arg_count];
-		// arg_count += 2;
+      	//has to enter gallery first before arrival to room
+
+  			room = malloc(strlen(argv[arg_count]));
+  			room = argv[arg_count];
+			arg_count += 2;
+		
 		break;
       default:
         //unknown option, leave
@@ -111,11 +127,14 @@ int parse_cmdline(int argc, char *argv[]) {
   }else{
   	fwrite(" G: ",1,4,log);
   }
+  fwrite("\n",1,1,log);
   fclose(log);
 
-
-  //free(token);
-  //free(timestamp);
+  // free(room);
+  // free(departure);
+  // free(arrival);
+  // free(token);
+  // free(timestamp);
   return is_good;
 }
 
