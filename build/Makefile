@@ -9,10 +9,10 @@ CFLAGS += -DLINUX -I/usr/local/ssl/include -L/usr/local/ssl/lib
 endif
 
 logappend: logappend_skel.o
-	$(CC) -o $@ $(CFLAGS) $^ $(LIBS)
+	$(CC) -o $@ $(CFLAGS) $^ $(LFLAGS)
 
-logread: logread_skel.o data_skel.o
-	$(CC) -o $@ $(CFLAGS) $^ $(LIBS)
+logread: logread_skel.o
+	$(CC) -o $@ $(CFLAGS) $^ $(LFLAGS)
 
 logappend_skel.o: logappend_skel.c
 	$(CC) -c -o $@ $(CFLAGS) $^
