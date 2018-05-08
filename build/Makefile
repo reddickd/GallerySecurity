@@ -11,7 +11,7 @@ endif
 logappend: logappend_skel.o
 	$(CC) -o $@ $(CFLAGS) $^ $(LIBS)
 
-logread: logread_skel.o data_skel.o
+logread: logread_skel.o
 	$(CC) -o $@ $(CFLAGS) $^ $(LIBS)
 
 logappend_skel.o: logappend_skel.c
