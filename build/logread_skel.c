@@ -35,7 +35,8 @@ int main(int argc, char *argv[]) {
   char  *logpath = NULL,
     *TOKEN = NULL,
     *NAME = NULL,
-    *line;
+    *line,
+    *curr_line;
   extern char *optarg;
   int opt_S = 0, opt_R = 0, opt_I = 0, opt_T = 0;
 
@@ -44,6 +45,8 @@ int main(int argc, char *argv[]) {
   unsigned char key[16], iv[16];
   int f_size, i_len, o_len1 = 0, o_len2 = 0;
   EVP_CIPHER_CTX ctx;
+  char **all_lines = NULL;
+  int line_count = 0, line_index = 0;
 
 
   // parsing variables
@@ -163,7 +166,7 @@ int main(int argc, char *argv[]) {
   // read in ciphertext
   i_len = fread(ciphertext, 1, f_size, fp);
   ciphertext[i_len] = '\0';
-  // printf("%s\n", ciphertext);
+  // printf("%s\n\n", ciphertext);
   fclose(fp);
 
 
@@ -177,17 +180,25 @@ int main(int argc, char *argv[]) {
   EVP_DecryptFinal(&ctx, plaintext + o_len1, &o_len2);
   plaintext[o_len1+o_len2] = '\0';
 
-  free(ciphertext);
-  printf("%s", plaintext);
+  // free(ciphertext);
 
-  line = strtok((char *)plaintext, "\n");
+  // copy all plaintext lines
+  line_count = 0;
+  curr_line = strtok((char *)plaintext, "\n");
+  while (curr_line != NULL) {
+    // printf("%s\n", curr_line);
 
-  return 0;
+    all_lines = (char **) realloc(all_lines, (line_count + 1) * sizeof(char *));
+    all_lines[line_count++] = strdup(curr_line);
+    curr_line = strtok(NULL, "\n");
+  }
 
   // TODO: REPLACE GETLINE WITH STRTOK --- go through the each line of the file
-  while (line != NULL) {
+  // TODO: free all_lines
+  for (line_index = 0; line_index < line_count; line_index++) {
     
     // BEST FRIEND
+    line = all_lines[line_index];
     // printf("%s\n", line);
 
     // parse line into respective variables
@@ -444,7 +455,6 @@ int main(int argc, char *argv[]) {
         }
       }
     }
-   line = strtok(NULL, "\n"); 
   }
 
     if (opt_S == 1) {

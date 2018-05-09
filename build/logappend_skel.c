@@ -146,10 +146,26 @@ int parse_cmdline(int argc, char *argv[]) {
         //secret token
         // token = malloc(sizeof(char*)*strlen(argv[arg_count]));
         // token = argv[arg_count];
-      	
-      	for(k = 0;k<16;k++){
-      		token[k] = argv[arg_count][k];
+      	if(strlen(argv[arg_count])>16){
+      		for(k = 0;k<16;k++){
+      			token[k] = argv[arg_count][k];
+      		}
+      	}else{
+      		for(k = 0; k < strlen(argv[arg_count]);k++){
+				if(argv[arg_count][k] == '\0'){
+					token[k] = '\x20';
+				}else{
+					token[k] = argv[arg_count][k];
+				}
+			}
+			for(k = strlen(argv[arg_count]); k < 16;k++){
+				token[k] = '\x20';
+			}
+			// line[strlen(line)+1] = '\x20';
+			// strcat(pad,line);
+			token[16] = '\0';
       	}
+      	
       	//token[17] = '\n';
       	//token_spot = arg_count;
         arg_count += 2;
@@ -427,22 +443,22 @@ int parse_cmdline(int argc, char *argv[]) {
 				printf("invalid, new guest needs to enter gallery first");
 				exit(255);
 			}	
-		}else if(isArr==1&&strcmp("DP\n",recent_arr_dep)!=0&&strcmp("-",recent_room)!=0){
+		}else if(isArr==1&&strcmp("DP",recent_arr_dep)!=0&&strcmp("-",recent_room)!=0){
 			printf("invalid, need to leave room first");
 			exit(255);				
-		}else if(room!=NULL&&isArr == 1&&strcmp(room,recent_room)==0&&strcmp("DP\n",recent_arr_dep)!=0){
+		}else if(room!=NULL&&isArr == 1&&strcmp(room,recent_room)==0&&strcmp("DP",recent_arr_dep)!=0){
 			printf("cant enter a room twice");
 			exit(255);
-		}else if(room == NULL && isArr == 1&& strcmp("-",recent_room)==0&&strcmp("AV\n",recent_arr_dep)==0){
+		}else if(room == NULL && isArr == 1&& strcmp("-",recent_room)==0&&strcmp("AV",recent_arr_dep)==0){
 			printf("cant enter gallery twice");
 			exit(255);
-		}else if(room!=NULL&&isArr == 0&&strcmp("DP\n",recent_arr_dep)==0&&strcmp(room,recent_room)!=0){
+		}else if(room!=NULL&&isArr == 0&&strcmp("DP",recent_arr_dep)==0&&strcmp(room,recent_room)!=0){
 			printf("cant leave room twice unless leaving gallery");
 			exit(255);
-		}else if(room!=NULL&&isArr == 0&&strcmp(recent_room,"-")!=0&&strcmp("DP\n",recent_arr_dep)==0){
+		}else if(room!=NULL&&isArr == 0&&strcmp(recent_room,"-")!=0&&strcmp("DP",recent_arr_dep)==0){
 			printf("have to leave the room you are in, not the leaving gallery check");
 			exit(255);
-		}else if(room == NULL&&strcmp("DP\n",recent_arr_dep)==0&&strcmp("-",recent_room)==0&&isArr==0){
+		}else if(room == NULL&&strcmp("DP",recent_arr_dep)==0&&strcmp("-",recent_room)==0&&isArr==0){
 			printf("cant leave gallery twice");
 			exit(255);
 		}else if(room != NULL&&strcmp("DP\n",recent_arr_dep)==0&&strcmp("-",recent_room)==0){
