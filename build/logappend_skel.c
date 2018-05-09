@@ -28,7 +28,7 @@ int file_write(char* timestamp, char* name, char* logpath, int isEmp, int isArr,
 	FILE *n_log;
 	n_log = fopen(logpath, "w+");
 	if(n_log==NULL){
-		printf("invalid path");
+		printf("invalid\n");
 		exit(255);
 	}
 
@@ -85,7 +85,7 @@ int is_valid_name(char* name){
 	int j;
 	for(j=0;j<strlen(name);j++){
 		if(isalpha(name[j])==0){
-			printf("invalid name");
+			printf("invalid\n");
 			exit(255);
 		}
 	}
@@ -136,7 +136,7 @@ int parse_cmdline(int argc, char *argv[]) {
         timestamp = argv[arg_count];
         time_int = atoi(timestamp);
         if(time_int<=0||time_int>MAX_NUM){
-        	printf("invalid time");
+        	printf("invalid\n");
         	exit(255);
         }
         arg_count += 2;
@@ -175,7 +175,7 @@ int parse_cmdline(int argc, char *argv[]) {
       case 'A':
         //arrival
       	if(already_specified_arr_dep){
-      		printf("invalid,duplicate command");
+      		printf("invalid\n");
       		exit(255);
       	}else{
 	        arg_count++;
@@ -187,7 +187,7 @@ int parse_cmdline(int argc, char *argv[]) {
       case 'L':
         //departure
       if(already_specified_arr_dep){
-      		printf("invalid,duplicate command");
+      		printf("invalid\n");
       		exit(255);
       	}else{
         	arg_count++;
@@ -199,7 +199,7 @@ int parse_cmdline(int argc, char *argv[]) {
       case 'E':
         //employee name
       	if(already_specified_emp_gue){
-      		printf("invalid,duplicate command");
+      		printf("invalid\n");
       		exit(255);
       	}else{
 	        //name = malloc(sizeof(char*)*strlen(argv[arg_count]));
@@ -214,7 +214,7 @@ int parse_cmdline(int argc, char *argv[]) {
       case 'G':
         //guest name
       if(already_specified_emp_gue){
-      		printf("invalid,duplicate command");
+      		printf("invalid\n");
       		exit(255);
       	}else{
         	//name = malloc(sizeof(char*)*strlen(argv[arg_count]));
@@ -236,7 +236,7 @@ int parse_cmdline(int argc, char *argv[]) {
   		}
   		room_int = atoi(room);
   		if(room_int<0||room_int>MAX_NUM){
-  			printf("invalid room");
+  			printf("invalid\n");
   			exit(255);
   		}
 		arg_count += 2;
@@ -294,7 +294,7 @@ int parse_cmdline(int argc, char *argv[]) {
 
     	ctx = EVP_CIPHER_CTX_new();
     	if(!EVP_DecryptInit(ctx,EVP_aes_256_cbc(),token,iv)){
-    		printf("invalid decrpyt");
+    		printf("invalid\n");
     		exit(255);
     	}
     	EVP_DecryptUpdate(ctx, out_data,&out_len1,buffer,fsize);
@@ -433,42 +433,42 @@ int parse_cmdline(int argc, char *argv[]) {
     	int prev_time_int = atoi(prev_timestamp);
 
     	if(prev_time_int >= time_int){
-    		printf("invalid, time doesnt go backwards");
+    		printf("invalid\n");
     		exit(255);
     	}
     	if(new_name == 1){
 			if(isArr==1&&room==NULL){
 				file_write(timestamp,name,logpath,isEmp,isArr,NULL,copy_array,num_lines);
 			}else{
-				printf("invalid, new guest needs to enter gallery first");
+				printf("invalid\n");
 				exit(255);
 			}	
 		}else if(isArr==1&&strcmp("DP",recent_arr_dep)!=0&&strcmp("-",recent_room)!=0){
-			printf("invalid, need to leave room first");
+			printf("invalid\n");
 			exit(255);				
 		}else if(room!=NULL&&isArr == 1&&strcmp(room,recent_room)==0&&strcmp("DP",recent_arr_dep)!=0){
-			printf("cant enter a room twice");
+			printf("invalid\n");
 			exit(255);
 		}else if(room == NULL && isArr == 1&& strcmp("-",recent_room)==0&&strcmp("AV",recent_arr_dep)==0){
-			printf("cant enter gallery twice");
+			printf("invalid\n");
 			exit(255);
 		}else if(room!=NULL&&isArr == 0&&strcmp("DP",recent_arr_dep)==0&&strcmp(room,recent_room)!=0){
-			printf("cant leave room twice unless leaving gallery");
+			printf("invalid\n");
 			exit(255);
 		}else if(room!=NULL&&isArr == 0&&strcmp(recent_room,"-")!=0&&strcmp("DP",recent_arr_dep)==0){
-			printf("have to leave the room you are in, not the leaving gallery check");
+			printf("invalid\n");
 			exit(255);
 		}else if(room == NULL&&strcmp("DP",recent_arr_dep)==0&&strcmp("-",recent_room)==0&&isArr==0){
-			printf("cant leave gallery twice");
+			printf("invalid\n");
 			exit(255);
 		}else if(room != NULL&&strcmp("DP\n",recent_arr_dep)==0&&strcmp("-",recent_room)==0){
-			printf("have to enter gallery before room");
+			printf("invalid\n");
 			exit(255);
 		}else if(room!=NULL&&isArr == 0&&strcmp(recent_room,room)!=0&&strcmp("AV\n",recent_arr_dep)==0){
-			printf("have to leave current room before gallery");
+			printf("invalid\n");
 			exit(255);
 		}else if(room == NULL&&isArr == 0&&strcmp("-",recent_room)!=0&&strcmp("AV\n",recent_arr_dep)==0){
-			printf("cant leave room straight to gallery");
+			printf("invalid\n");
 			exit(255);
 		}else if(room == NULL&&strcmp("-",recent_room)){
 			//printf("leaving gallery");
@@ -507,7 +507,7 @@ int parse_cmdline(int argc, char *argv[]) {
 		
     }else{//else if file doesnt exist aka first entry
 		if(room!=NULL||time_int<0||isArr==0){//and room is not specified
-	   		printf("invalid, first guest needs to enter gallery");
+	   		printf("invalid\n");
 			exit(255);
 		}else{
 			
@@ -518,7 +518,7 @@ int parse_cmdline(int argc, char *argv[]) {
 
 			FILE *fp = fopen(logpath,"r");
 			if(fp==NULL){
-				printf("invalid");
+				printf("invalid\n");
 				exit(255);
 			}
 			fseek(fp,0L,SEEK_END);
