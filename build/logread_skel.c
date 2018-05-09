@@ -22,21 +22,22 @@ char* concat(const char *s1, const char *s2);
 int contains(const char *str, char **list, const int num);
 static int myCompare(const void * str1, const void * str2);
 void sort(char *list[], int num);
+static int roomCompare(const void * a, const void * b);
 
 struct room {
   int room_num;
   char **people;
   int num_people;
-};
+}room;
 
 int main(int argc, char *argv[]) {
 
   FILE *fp;
   size_t line_length = 0;
   ssize_t len;
-  int i, j, exists, opt, state_or_rooms, is_employee = 0, is_guest = 0;
+  int i, j, k, exists, opt, state_or_rooms, is_employee = 0, is_guest = 0;
   char  *logpath = NULL,
-    *TOKEN = NULL,
+    // *TOKEN = NULL,
     *NAME = NULL,
     *line;
   extern char *optarg;
@@ -69,7 +70,7 @@ int main(int argc, char *argv[]) {
     // printf("%c\n", opt);
     switch(opt) {
       case 'K':
-        TOKEN = optarg;
+        // TOKEN = optarg;
         // TODO: check token is alphanumeric
         // TODO: check if decrypt works
 
@@ -337,10 +338,61 @@ int main(int argc, char *argv[]) {
             // printf("created new room for %d\n", i_room);
           }
         }
-
-
-      } else if (i_room != -1 && (strcmp(i_action, "DP"))) {
+      } else if (i_room != -1 && (strcmp(i_action, "DP") == 0)) {
         // leaving a room - remove person from the room's list
+
+        // find the specific room
+        for (i = 0; i < num_rooms; i++) {
+          if (all_rooms[i]->room_num == i_room) {
+            break;
+          }
+        }
+        if (i >= num_rooms) {
+          // room was not found - log was wrong
+          printf("integrity violation\n");
+          return 255;
+        } else {
+            if (contains(i_name, all_rooms[i]->people, all_rooms[i]->num_people)) {
+              // remove name if its contained
+
+              for (j = 0; j < all_rooms[i]->num_people; j++) {
+                // find matching name
+                if (strcmp(i_name, all_rooms[i]->people[j]) == 0) {
+
+                  // remove the name
+                  free(all_rooms[i]->people[j]);
+                  all_rooms[i]->people[j] = NULL;
+
+                  // decrease num of people
+                  all_rooms[i]->num_people -= 1;
+
+                  // printf("removed %s from %d\n", i_name, i_room);
+                  break;
+                }
+              }
+              // [0, 1, 2, 3] -- 4 -> done
+              // [0, NULL, 2, 3] -- 3 -> done
+              // [0, NULL, 2] -- 2 -> done
+              // [0, NULL] -- 1 -> done
+              // [NULL -- 0] -> done
+              // go through and shift down the ones after the removed name
+              for (k = j; k < all_rooms[i]->num_people; k++) {
+                if (k + 1 <= all_rooms[i]->num_people) {
+                  // copy name from k + 1 to k
+                  all_rooms[i]->people[k] = strdup(all_rooms[i]->people[k + 1]);
+                  
+                  if (k + 1 == all_rooms[i]->num_people) {
+                    // remove free and NULL the the last entry after shifting
+                    free(all_rooms[i]->people[k + 1]);
+                    all_rooms[i]->people[k + 1] = NULL;
+                  }
+                }
+              }
+
+            }
+        }
+
+        // 
 
       }
 
@@ -429,6 +481,10 @@ int main(int argc, char *argv[]) {
         free(guest_names);
       }
 
+
+      // TODO: sort all the rooms
+      qsort(all_rooms, num_rooms, sizeof(struct room *), roomCompare);
+
       // print out list of rooms
       for(i = 0; i < num_rooms; i++) {
         if (all_rooms[i]->num_people > 0) {
@@ -505,4 +561,11 @@ static int myCompare(const void * str1, const void * str2) {
 
 void sort(char *list[], int num) {
   qsort(list, num, sizeof(const char *), myCompare);
+}
+
+static int roomCompare(const void *a, const void *b) {
+  const struct room* roomA = *(struct room **)a;
+  const struct room* roomB = *(struct room **)b;
+
+  return (roomA->room_num < roomB->room_num) ? -1 : (roomA->room_num > roomB->room_num);
 }
