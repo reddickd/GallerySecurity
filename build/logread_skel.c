@@ -31,20 +31,19 @@ struct room {
 int main(int argc, char *argv[]) {
 
   FILE *fp;
-  size_t line_length = 0;
-  ssize_t len;
   int i, j, k, exists, opt, is_employee = 0, is_guest = 0;
   char  *logpath = NULL,
-    // *TOKEN = NULL,
+    *TOKEN = NULL,
     *NAME = NULL,
     *line;
   extern char *optarg;
   int opt_S = 0, opt_R = 0, opt_I = 0, opt_T = 0;
 
   // decryption variables
-  // unsigned char *ciphertext, *plaintext, key[16], iv[16];
-  // int i_len, o_len1 = 0, o_len2 = 0;
-  // EVP_CIPHER_CTX ctx;
+  unsigned char *ciphertext, *plaintext;
+  unsigned char key[16], iv[16];
+  int f_size, i_len, o_len1 = 0, o_len2 = 0;
+  EVP_CIPHER_CTX ctx;
 
 
   // parsing variables
@@ -58,28 +57,34 @@ int main(int argc, char *argv[]) {
   int num_rooms;
   struct room **all_rooms = NULL;
 
-
   // all rooms variables
   char *room_list = NULL, i_room_str[11];
 
   // init prev_action
   prev_action = NULL;
 
+  // create iv
+  for (i = 0; i < sizeof(iv); i++) {
+    iv[i] = '\x00';
+  }
+
   while ((opt = getopt(argc, argv, "K:SRE:G:IT")) != -1) {
     // printf("%c\n", opt);
     switch(opt) {
       case 'K':
-        // TOKEN = optarg;
+        TOKEN = optarg;
         // TODO: check token is alphanumeric
         // TODO: check if decrypt works
 
         // create key
-
-        // create iv
-        // int i = 0;
-        // for (i = 0; i < sizeof(iv); i++) {
-        //   iv[i] = '\x00';
-        // }
+        for (i = 0; i < sizeof(key); i++) {
+          if (i < strlen(TOKEN)) {
+            key[i] = TOKEN[i];
+          } else {
+            key[i] = 0x20;
+          }
+        }
+        key[i] = '\0';
 
         break;
 
@@ -148,49 +153,39 @@ int main(int argc, char *argv[]) {
     return 255;
   }
 
-  // // initial check for file not even containing tag
-  // if (f_size < 16)
-  //   return throw_inv();
+  // get the ciphertext size
+  fseek(fp, 0L, SEEK_END);
+  f_size = ftell(fp);
+  fseek(fp, 0L, SEEK_SET);
+  ciphertext = malloc(f_size);
+  plaintext = malloc(f_size *2);
 
-  // // detach tag
-  // i_len = f_size - 17;
-  // j = 0;
-  // for (i = 0; i < f_size; i++) {
-  //   if (i < (i_len)) {
-  //     // just the msg
-  //     i_msg[i] = buffer[i];
-  //   } else {
-  //     // the tag
-  //     tag[j] = buffer[i];
-  //     j++;
-  //   }
-  // }
+  // read in ciphertext
+  i_len = fread(ciphertext, 1, f_size, fp);
+  ciphertext[i_len] = '\0';
+  // printf("%s\n", ciphertext);
+  fclose(fp);
 
-  // // Decrypt log file
+
+  // Decrypt log file
   // ctx = EVP_CIPHER_CTX_new();
-  // if (!EVP_DecryptInit(&ctx, EVP_aes_256_gcm(), key, iv)) {
-  //   printf("integrity violation\n");
-  //   return 255;
-  // }
-  // EVP_DecryptUpdate(&ctx, plaintext, &o_len1, ciphertext, i_len);
+  if (!EVP_DecryptInit(&ctx, EVP_aes_256_cbc(), key, iv)) {
+    printf("integrity violation\n");
+    return 255;
+  }
+  EVP_DecryptUpdate(&ctx, plaintext, &o_len1, ciphertext, i_len);
+  EVP_DecryptFinal(&ctx, plaintext + o_len1, &o_len2);
+  plaintext[o_len1+o_len2] = '\0';
 
-  // // check tag
-  // if (!EVP_CIPHER_CTX_ctrl(ctx, EVP_CTRL_GCM_SET_TAG, 16, tag)) {
-  //   printf("integrity violation\n");
-  //   return 255;        
-  // }
-  // EVP_DecryptFinal(&ctx, plaintext + o_len1, &o_len2);
-  // plaintext[o_len1+o_len2] = '\0';
+  free(ciphertext);
+  printf("%s", plaintext);
 
-  // go through the each line of the file
-  while ((len = getline(&line, &line_length, fp)) != -1) {
-    
-    // end each line
-    if (strchr(line, '\n')){
-      line[len-1] = '\0';
-    } else {
-      line[len] = '\0';
-    }
+  line = strtok((char *)plaintext, "\n");
+
+  return 0;
+
+  // TODO: REPLACE GETLINE WITH STRTOK --- go through the each line of the file
+  while (line != NULL) {
     
     // BEST FRIEND
     // printf("%s\n", line);
@@ -449,9 +444,8 @@ int main(int argc, char *argv[]) {
         }
       }
     }
-
+   line = strtok(NULL, "\n"); 
   }
-  fclose(fp);
 
     if (opt_S == 1) {
       // print out current state
@@ -545,6 +539,7 @@ int main(int argc, char *argv[]) {
       }
     }
 
+    free(plaintext);
     return 0;
 }
 
