@@ -181,7 +181,7 @@ int main(int argc, char *argv[]) {
   plaintext[o_len1+o_len2] = '\0';
 
   // ::::FOR TESTING::::
-  // printf("%s---\n", plaintext);
+  //printf("%s---\n", plaintext);
 
   // free(ciphertext);
 
