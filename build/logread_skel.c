@@ -77,7 +77,7 @@ int main(int argc, char *argv[]) {
       case 'K':
         TOKEN = optarg;
         // TODO: check token is alphanumeric
-        // TODO: check if decrypt works
+        // check if decrypt works
 
         // create key
         for (i = 0; i < sizeof(key); i++) {
@@ -180,6 +180,9 @@ int main(int argc, char *argv[]) {
   EVP_DecryptFinal(&ctx, plaintext + o_len1, &o_len2);
   plaintext[o_len1+o_len2] = '\0';
 
+  // ::::FOR TESTING::::
+  // printf("%s---\n", plaintext);
+
   // free(ciphertext);
 
   // copy all plaintext lines
@@ -193,8 +196,8 @@ int main(int argc, char *argv[]) {
     curr_line = strtok(NULL, "\n");
   }
 
-  // TODO: REPLACE GETLINE WITH STRTOK --- go through the each line of the file
-  // TODO: free all_lines
+  // go through the each line of the file
+  // free all_lines
   for (line_index = 0; line_index < line_count; line_index++) {
     
     // BEST FRIEND
@@ -550,6 +553,10 @@ int main(int argc, char *argv[]) {
     }
 
     free(plaintext);
+    for (i = 0; i < line_count; i++) {
+      free(all_lines[i]);
+    }
+    free(all_lines);
     return 0;
 }
 
