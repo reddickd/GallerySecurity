@@ -16,8 +16,6 @@
 #define int_max 1073741823
 
 
-// state_or_rooms = 0 for current state
-// state_or_rooms = 1 for all rooms
 char* concat(const char *s1, const char *s2);
 int contains(const char *str, char **list, const int num);
 static int myCompare(const void * str1, const void * str2);
@@ -35,12 +33,13 @@ int main(int argc, char *argv[]) {
   FILE *fp;
   size_t line_length = 0;
   ssize_t len;
-  int i, j, k, exists, opt, state_or_rooms, is_employee = 0, is_guest = 0;
+  int i, j, k, exists, opt, is_employee = 0, is_guest = 0;
   char  *logpath = NULL,
     // *TOKEN = NULL,
     *NAME = NULL,
     *line;
   extern char *optarg;
+  int opt_S = 0, opt_R = 0, opt_I = 0, opt_T = 0;
 
   // decryption variables
   // unsigned char *ciphertext, *plaintext, key[16], iv[16];
@@ -86,34 +85,47 @@ int main(int argc, char *argv[]) {
 
       case 'S':
         // print current state
-        state_or_rooms = 0;
+        opt_S = 1;
         break;
 
       case 'R':
         // print all rooms entered by employee or guest
-        state_or_rooms = 1;
+        opt_R = 1;
         break;
 
       case 'E':
         NAME = optarg;
         is_employee = 1;
+        is_guest = 0;
         // printf("employee name: %s\n", NAME);
         break;
 
       case 'G':
         NAME = optarg;
         is_guest = 1;
+        is_employee = 0;
         // printf("guest name: %s\n", NAME);
         break;
 
       case 'I':
-        printf("unimplemented\n"); 
+        opt_I = 1;
         break;
 
       case 'T':
-        printf("unimplemented\n");
+        opt_T = 1;
         break;
     }
+  }
+
+  // check for option cases
+  if ((opt_S && opt_R) || (opt_S && opt_I) || (opt_S && opt_T) || (opt_R && opt_I) || (opt_R && opt_T) || ((opt_I && opt_T))) {
+    // only one -S -R -I or -T and if both -R and -T
+    printf("invalid\n");
+    return 255;
+  } else if (opt_I || opt_T) {
+    // optional options
+    printf("unimplemented\n");
+    return 0;
   }
 
   if(optind < argc) {
@@ -124,7 +136,7 @@ int main(int argc, char *argv[]) {
   // printf("name: %s\n", NAME);
 
   // check for -R used with employee or guest
-  if (state_or_rooms == 1 && (is_employee == 0 && is_guest == 0)) {
+  if (opt_R == 1 && (is_employee == 0 && is_guest == 0)) {
     printf("invalid\n");
     return 255;
   }
@@ -180,7 +192,8 @@ int main(int argc, char *argv[]) {
       line[len] = '\0';
     }
     
-    printf("%s\n", line);
+    // BEST FRIEND
+    // printf("%s\n", line);
 
     // parse line into respective variables
     i_temp = strtok(line, "|");
@@ -237,8 +250,8 @@ int main(int argc, char *argv[]) {
       i++;
     }
 
-    if (state_or_rooms == 0) {
-      // TODO: current state line processing
+    if (opt_S == 1) {
+      // current state line processing
 
       if (strcmp(i_role, "EM") == 0) {
         // get the names of employees
@@ -276,7 +289,7 @@ int main(int argc, char *argv[]) {
         }
       }
 
-      // TODO: get room information
+      // get room information
       if (i_room != -1 && (strcmp(i_action, "AV") == 0)) {
         // arriving in a room - add person to the room's list
         if (num_rooms == 0) {
@@ -397,7 +410,7 @@ int main(int argc, char *argv[]) {
       }
 
 
-    } else if (state_or_rooms == 1) {
+    } else if (opt_R == 1) {
       // all rooms line processing
       // check for matching name, matching role, and action with a room
       if ((strcmp(NAME, i_name) == 0) && ( ((strcmp(i_role, "EM") == 0) && (is_employee == 1)) || ((strcmp(i_role, "GU") == 0) && (is_guest == 1)) ) && i_room >= 0) {
@@ -440,8 +453,8 @@ int main(int argc, char *argv[]) {
   }
   fclose(fp);
 
-    if (state_or_rooms == 0) {
-      // TODO: print out current state
+    if (opt_S == 1) {
+      // print out current state
 
       // sort the employee and guest names
       sort(employee_names, e_name_count);
@@ -482,7 +495,7 @@ int main(int argc, char *argv[]) {
       }
 
 
-      // TODO: sort all the rooms
+      // sort all the rooms
       qsort(all_rooms, num_rooms, sizeof(struct room *), roomCompare);
 
       // print out list of rooms
@@ -524,7 +537,7 @@ int main(int argc, char *argv[]) {
       }
 
 
-    } else if (state_or_rooms == 1) {
+    } else if (opt_R == 1) {
       // print out list of rooms for person
       if (room_list != NULL) {
         printf("%s\n", room_list);
