@@ -380,33 +380,37 @@ int parse_cmdline(int argc, char *argv[]) {
     	a = 0; 
     	//while(strcmp(new_array[a],"")!=0){
     		//tok = strtok(line,"|");
-    		//tok = strtok(new_array[a],"|");
-    	tok = strtok(new_array[num_lines-1],"|");
-    		//prev_timestamp = malloc(sizeof(char*)*strlen(tok));
-		prev_timestamp = tok;
-		
-		i++;
-		while(tok != NULL){
+    	tok = strtok(new_array[a],"|");
+    	
+    	prev_timestamp = malloc(sizeof(char*)*strlen(tok));
 
-			tok = strtok(NULL,"|");
-			if(tok!= NULL&&strcmp("|",tok)!=0&&i==1){
-				//prev_name = malloc(sizeof(char*)*(strlen(tok)));
-				prev_name = tok;
-			}else if(tok!= NULL&&strcmp("|",tok)!=0&&i==2){
-				//prev_emp_gue = malloc(sizeof(char*)*(strlen(tok)));
-				prev_emp_gue = tok;
-			}else if(tok!= NULL&&strcmp("|",tok)!=0&&i==3){
-				//prev_room = malloc(sizeof(char*)*(strlen(tok)));
-				prev_room = tok;
-			}else if(tok!= NULL&&strcmp("|",tok)!=0&&i==4){
-				//prev_arr_dep = malloc(sizeof(char*)*(strlen(tok)));
-				prev_arr_dep = tok;
-			}
+    	for(a = 1; a < num_lines;a++){
+	    	tok = strtok(new_array[a],"|");
+	    		
+			prev_timestamp = tok;
 			
 			i++;
-		}//will save most recent data of the current name from the command
-		i = 0;
-		if(strcmp(prev_name,name)==0&&((strcmp(prev_emp_gue,"EM")==0&&isEmp==1)||(strcmp(prev_emp_gue,"GU")==0&&isEmp==0))){ 
+			while(tok != NULL){
+
+				tok = strtok(NULL,"|");
+				if(tok!= NULL&&strcmp("|",tok)!=0&&i==1){
+					//prev_name = malloc(sizeof(char*)*(strlen(tok)));
+					prev_name = tok;
+				}else if(tok!= NULL&&strcmp("|",tok)!=0&&i==2){
+					//prev_emp_gue = malloc(sizeof(char*)*(strlen(tok)));
+					prev_emp_gue = tok;
+				}else if(tok!= NULL&&strcmp("|",tok)!=0&&i==3){
+					//prev_room = malloc(sizeof(char*)*(strlen(tok)));
+					prev_room = tok;
+				}else if(tok!= NULL&&strcmp("|",tok)!=0&&i==4){
+					//prev_arr_dep = malloc(sizeof(char*)*(strlen(tok)));
+					prev_arr_dep = tok;
+				}
+				
+				i++;
+			}//will save most recent data of the current name from the command
+			i = 0;
+			if(strcmp(prev_name,name)==0&&((strcmp(prev_emp_gue,"EM")==0&&isEmp==1)||(strcmp(prev_emp_gue,"GU")==0&&isEmp==0))){ 
 				new_name = 0;
 
 				// recent_name = malloc(sizeof(char*)*(strlen(tok)));
@@ -420,8 +424,9 @@ int parse_cmdline(int argc, char *argv[]) {
 			
 				recent_arr_dep = malloc(sizeof(char*)*(strlen(prev_arr_dep)));
 				strcpy(recent_arr_dep,prev_arr_dep);	
+			}
 		}
-		a++;
+		//a++;
 	//}
     	
     	fclose(log);
