@@ -197,7 +197,6 @@ int main(int argc, char *argv[]) {
   }
 
   // go through the each line of the file
-  // free all_lines
   for (line_index = 0; line_index < line_count; line_index++) {
     
     // BEST FRIEND
@@ -257,6 +256,12 @@ int main(int argc, char *argv[]) {
 
       i_temp = strtok(NULL, "|");
       i++;
+    }
+
+    // checks the log has five deliminated things
+    if (i != 5) {
+      printf("integrity violation\n");
+      return 255;
     }
 
     if (opt_S == 1) {
