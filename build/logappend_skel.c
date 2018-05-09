@@ -264,7 +264,7 @@ int parse_cmdline(int argc, char *argv[]) {
     int i_len;
     //char *line = NULL;
     char *prev_name,*prev_timestamp,*prev_emp_gue,*prev_room,*prev_arr_dep;
-    char *recent_room,*recent_arr_dep,*recent_name;//,*recent_timestamp, *recent_emp,*/ 
+    char *recent_room,*recent_arr_dep;//*recent_name;//,*recent_timestamp, *recent_emp,*/ 
 
     
     
@@ -386,7 +386,7 @@ int parse_cmdline(int argc, char *argv[]) {
 
     	for(a = 0; a < num_lines;a++){
 	    	tok = strtok(new_array[a],"|");
-	    	prev_timestamp = malloc(sizeof(char*)*strlen(tok));
+	    	//prev_timestamp = malloc(sizeof(char*)*strlen(tok));
 			prev_timestamp = tok;
 			
 			i++;
@@ -413,8 +413,8 @@ int parse_cmdline(int argc, char *argv[]) {
 			if(strcmp(prev_name,name)==0&&((strcmp(prev_emp_gue,"EM")==0&&isEmp==1)||(strcmp(prev_emp_gue,"GU")==0&&isEmp==0))){ 
 				new_name = 0;
 
-				recent_name = malloc(sizeof(char*)*(strlen(prev_name)));
-				strcpy(recent_name,prev_name);
+				//recent_name = malloc(sizeof(char*)*(strlen(prev_name)));
+				//strcpy(recent_name,prev_name);
 			
 				// recent_emp = malloc(sizeof(char*)*(strlen(tok)));
 				// recent_emp = prev_emp_gue;
@@ -482,7 +482,8 @@ int parse_cmdline(int argc, char *argv[]) {
 		}else{
 			file_write(timestamp,name,logpath,isEmp,isArr,room,copy_array,num_lines);
 		}
-  		
+  		free(recent_arr_dep);
+  		free(recent_room);
   		
   		FILE *fp = fopen(logpath,"r");
   		if(fp==NULL){
@@ -510,6 +511,8 @@ int parse_cmdline(int argc, char *argv[]) {
    		//fwrite("\n",1,1,fp);
    		//fwrite(tag,1,16,fp);
    		fclose(fp);
+   		free(i_msg);
+    	free(out_data);
 		
     }else{//else if file doesnt exist aka first entry
 		if(room!=NULL||time_int<0||isArr==0){//and room is not specified
@@ -548,7 +551,10 @@ int parse_cmdline(int argc, char *argv[]) {
 			//fwrite("\n",1,1,fp);
 			//fwrite(tag,1,16,fp);
 			fclose(fp);
+			free(i_msg);
+    		free(out_data);
 		}
+
 	}
 
 	//free EVERYTHING i think...
