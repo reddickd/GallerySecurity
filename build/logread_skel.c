@@ -481,7 +481,7 @@ int main(int argc, char *argv[]) {
 
           // check if name is contained in guests
           if (contains(i_name, guest_names, g_name_count)) {
-            
+
             for (j = 0; j < g_name_count; j++) {
               // find matching name
               if (strcmp(i_name, guest_names[j]) == 0) {
@@ -659,7 +659,7 @@ int main(int argc, char *argv[]) {
     } else if (opt_R == 1) {
       // print out list of rooms for person
       if (room_list != NULL) {
-        printf("%s\n", room_list);
+        printf("%s", room_list);
         free(room_list);
       }
     }
