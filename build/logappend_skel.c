@@ -421,6 +421,8 @@ int parse_cmdline(int argc, char *argv[]) {
 				i++;
 			}//will save most recent data of the current name from the command
 			i = 0;
+			recent_room = malloc(sizeof(char*)*(strlen(prev_room)));
+			recent_arr_dep = malloc(sizeof(char*)*(strlen(prev_arr_dep)));
 			if(strcmp(prev_name,name)==0&&((strcmp(prev_emp_gue,"EM")==0&&isEmp==1)||(strcmp(prev_emp_gue,"GU")==0&&isEmp==0))){ 
 				new_name = 0;
 
@@ -430,10 +432,10 @@ int parse_cmdline(int argc, char *argv[]) {
 				// recent_emp = malloc(sizeof(char*)*(strlen(tok)));
 				// recent_emp = prev_emp_gue;
 			
-				recent_room = malloc(sizeof(char*)*(strlen(prev_room)));
+				
 				strcpy(recent_room,prev_room);
 			
-				recent_arr_dep = malloc(sizeof(char*)*(strlen(prev_arr_dep)));
+				
 				strcpy(recent_arr_dep,prev_arr_dep);	
 			}
 		}
@@ -478,13 +480,13 @@ int parse_cmdline(int argc, char *argv[]) {
 		}else if(room == NULL&&strcmp("DP",recent_arr_dep)==0&&strcmp("-",recent_room)==0&&isArr==0){
 			printf("invalid\n");
 			exit(255);
-		}else if(room != NULL&&strcmp("DP\n",recent_arr_dep)==0&&strcmp("-",recent_room)==0){
+		}else if(room != NULL&&strcmp("DP",recent_arr_dep)==0&&strcmp("-",recent_room)==0){
 			printf("invalid\n");
 			exit(255);
-		}else if(room!=NULL&&isArr == 0&&strcmp(recent_room,room)!=0&&strcmp("AV\n",recent_arr_dep)==0){
+		}else if(room!=NULL&&isArr == 0&&strcmp(recent_room,room)!=0&&strcmp("AV",recent_arr_dep)==0){
 			printf("invalid\n");
 			exit(255);
-		}else if(room == NULL&&isArr == 0&&strcmp("-",recent_room)!=0&&strcmp("AV\n",recent_arr_dep)==0){
+		}else if(room == NULL&&isArr == 0&&strcmp("-",recent_room)!=0&&strcmp("AV",recent_arr_dep)==0){
 			printf("invalid\n");
 			exit(255);
 		}else if(room == NULL&&strcmp("-",recent_room)){
@@ -494,7 +496,8 @@ int parse_cmdline(int argc, char *argv[]) {
 			file_write(timestamp,name,logpath,isEmp,isArr,room,copy_array,num_lines);
 		}
   		//free(prev_room);
-  		//free(recent_room);
+  		free(recent_room);
+  		free(recent_arr_dep);
   		
   		FILE *fp = fopen(logpath,"r");
   		if(fp==NULL){
