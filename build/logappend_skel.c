@@ -152,7 +152,7 @@ int parse_cmdline(int argc, char *argv[]) {
       	
 		for(p=0;p<strlen(argv[arg_count]);p++){
 			if(isalpha(argv[arg_count][p])==0&&!isdigit(argv[arg_count][p])){
-				printf("invalid token\n");
+				printf("invalid\n");
 				exit(255);
 			}
 		}

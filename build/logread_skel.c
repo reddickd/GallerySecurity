@@ -79,11 +79,9 @@ int main(int argc, char *argv[]) {
         TOKEN = optarg;
         // check token is alphanumeric
         for(j=0;j<strlen(TOKEN);j++){
-          if(isalpha(TOKEN[j]) == 0){
-            if (isdigit(TOKEN[j]) == 0) {
+          if(isalpha(TOKEN[j]) == 0 && isdigit(TOKEN[j]) == 0) {
               printf("invalid\n");
               exit(255);
-            }
           }
         }
 
@@ -141,7 +139,7 @@ int main(int argc, char *argv[]) {
   if ((opt_S && opt_R) || (opt_S && opt_I) || (opt_S && opt_T) || (opt_R && opt_I) || (opt_R && opt_T) || ((opt_I && opt_T))) {
     // only one -S -R -I or -T and if both -R and -T
     printf("invalid\n");
-    return 255;
+    exit(255);
   } else if (opt_I || opt_T) {
     // optional options
     printf("unimplemented\n");
@@ -158,14 +156,14 @@ int main(int argc, char *argv[]) {
   // check for -R used with employee or guest
   if (opt_R == 1 && (is_employee == 0 && is_guest == 0)) {
     printf("invalid\n");
-    return 255;
+    exit(255);
   }
 
   // get and check the log file
   fp = fopen(logpath, "r");
   if (fp == NULL) {
     printf("invalid\n");
-    return 255;
+    exit(255);
   }
 
   // get the ciphertext size
@@ -186,7 +184,7 @@ int main(int argc, char *argv[]) {
   ctx = EVP_CIPHER_CTX_new();
   if (!EVP_DecryptInit(ctx, EVP_aes_256_cbc(), key, iv)) {
     printf("integrity violation\n");
-    return 255;
+    exit(255);
   }
   EVP_DecryptUpdate(ctx, plaintext, &o_len1, ciphertext, i_len);
   EVP_DecryptFinal(ctx, plaintext + o_len1, &o_len2);
@@ -228,7 +226,7 @@ int main(int argc, char *argv[]) {
           // check for timestamp integrity violation
           if (i_time <= prev_time || i_time > int_max || i_time < 1) {
             printf("integrity violation\n");
-            return 255;
+            exit(255);
           } else {
             prev_time = i_time;
           }
@@ -241,7 +239,7 @@ int main(int argc, char *argv[]) {
           // check for valid role
           if ((strcmp(i_temp, "EM") != 0) && (strcmp(i_temp, "GU") != 0)) {
             printf("integrity violation\n");
-            return 255;
+            exit(255);
           }
           i_role = i_temp;
           break;
@@ -254,14 +252,14 @@ int main(int argc, char *argv[]) {
           //check for valid room id
           if ((i_room < 0 && i_room != -1) || i_room > int_max) {
             printf("integrity violation\n");
-            return 255;
+            exit(255);
           }
           break;
         case 4:
           // check for valid action
           if ((strcmp(i_temp, "AV") != 0) && (strcmp(i_temp, "DP") != 0)) {
             printf("integrity violation\n");
-            return 255;
+            exit(255);
           }
           i_action = i_temp;
           break;
@@ -274,7 +272,7 @@ int main(int argc, char *argv[]) {
     // checks the log has five deliminated things
     if (i != 5) {
       printf("integrity violation\n");
-      return 255;
+      exit(255);
     }
 
     if (opt_S == 1) {
@@ -391,7 +389,7 @@ int main(int argc, char *argv[]) {
         if (i >= num_rooms) {
           // room was not found - log was wrong
           printf("integrity violation\n");
-          return 255;
+          exit(255);
         } else {
             if (contains(i_name, all_rooms[i]->people, all_rooms[i]->num_people)) {
               // remove name if its contained
@@ -474,7 +472,7 @@ int main(int argc, char *argv[]) {
 
           } else {
             printf("integrity violation\n");
-            return 255;
+            exit(255);
           }
 
         } else if (strcmp(i_role, "GU") == 0) {
@@ -514,12 +512,12 @@ int main(int argc, char *argv[]) {
 
           } else {
             printf("integrity violation\n");
-            return 255;
+            exit(255);
           }
 
         } else {
           printf("integrity violation\n");
-          return 255;
+          exit(255);
         }
       }
 
@@ -544,7 +542,7 @@ int main(int argc, char *argv[]) {
               free(room_list);
             }
             printf("integrity violation\n");
-            return 255;
+            exit(255);
           } else {
 
             if (strcmp(i_action, "AV") == 0) {
