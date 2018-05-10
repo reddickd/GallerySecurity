@@ -327,7 +327,7 @@ int parse_cmdline(int argc, char *argv[]) {
     	
     	//int total_len = out_len1+out_len2;
     	//free(i_msg);
-    	printf("%s", (char*)out_data);
+    	//lprintf("%s", (char*)out_data);
     	int num_lines = 0;
     	int max_len = 0;
     	// int 
@@ -608,7 +608,7 @@ int main(int argc, char *argv[]) {
   int result;
   result = parse_cmdline(argc, argv);
   if(result!= -1){
-  	printf("bad");
+  	printf("invalid");
   }
 
 
