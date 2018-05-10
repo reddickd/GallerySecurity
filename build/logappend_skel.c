@@ -118,6 +118,7 @@ int parse_cmdline(int argc, char *argv[]) {
 	int out_len1 = 0;
 	int out_len2 = 0;
 	int k;
+	int p;
 
 	EVP_CIPHER_CTX *ctx;
  
@@ -146,6 +147,15 @@ int parse_cmdline(int argc, char *argv[]) {
         //secret token
         // token = malloc(sizeof(char*)*strlen(argv[arg_count]));
         // token = argv[arg_count];
+
+      	
+		for(p=0;p<strlen(argv[arg_count]);p++){
+			if(isalpha(argv[arg_count][p])==0&&!isdigit(argv[arg_count][p])){
+				printf("invalid token\n");
+				exit(255);
+			}
+		}
+
       	if(strlen(argv[arg_count])>16){
       		for(k = 0;k<16;k++){
       			token[k] = argv[arg_count][k];
