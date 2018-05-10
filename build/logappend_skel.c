@@ -315,7 +315,7 @@ int parse_cmdline(int argc, char *argv[]) {
     	EVP_CIPHER_CTX_free(ctx);
     	
     	//int total_len = out_len1+out_len2;
-    	free(i_msg);
+    	//free(i_msg);
     	
     	int num_lines = 0;
     	int max_len = 0;
@@ -483,8 +483,8 @@ int parse_cmdline(int argc, char *argv[]) {
 		}else{
 			file_write(timestamp,name,logpath,isEmp,isArr,room,copy_array,num_lines);
 		}
-  		free(recent_arr_dep);
-  		free(recent_room);
+  		//free(prev_room);
+  		//free(recent_room);
   		
   		FILE *fp = fopen(logpath,"r");
   		if(fp==NULL){
