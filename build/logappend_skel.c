@@ -57,7 +57,7 @@ int file_write(char* timestamp, char* name, char* logpath, int isEmp, int isArr,
     }
     fwrite("|",1,1,n_log);
     if(isArr==0&&room !=NULL){
-    	fwrite(room,1,1,n_log);
+    	fwrite(room,1,strlen(room),n_log);
 	}else if(isArr == 1&& room!=NULL) {
 		fwrite(room,1,strlen(room),n_log);
 	}else if(isArr == 0&&room ==NULL){
@@ -119,6 +119,7 @@ int parse_cmdline(int argc, char *argv[]) {
 	int out_len2 = 0;
 	int k;
 	int p;
+	int room_set = 0;
 
 	EVP_CIPHER_CTX *ctx;
  
@@ -326,7 +327,7 @@ int parse_cmdline(int argc, char *argv[]) {
     	
     	//int total_len = out_len1+out_len2;
     	//free(i_msg);
-    	
+    	printf("%s", (char*)out_data);
     	int num_lines = 0;
     	int max_len = 0;
     	// int 
@@ -421,21 +422,21 @@ int parse_cmdline(int argc, char *argv[]) {
 				i++;
 			}//will save most recent data of the current name from the command
 			i = 0;
-			recent_room = malloc(sizeof(char*)*(strlen(prev_room)));
-			recent_arr_dep = malloc(sizeof(char*)*(strlen(prev_arr_dep)));
+			
+			//recent_room = malloc(sizeof(char*)*(strlen(prev_room)));
+			//recent_arr_dep = malloc(sizeof(char*)*(strlen(prev_arr_dep)));
 			if(strcmp(prev_name,name)==0&&((strcmp(prev_emp_gue,"EM")==0&&isEmp==1)||(strcmp(prev_emp_gue,"GU")==0&&isEmp==0))){ 
 				new_name = 0;
-
+				room_set = 1;
 				//recent_name = malloc(sizeof(char*)*(strlen(prev_name)));
 				//strcpy(recent_name,prev_name);
 			
 				// recent_emp = malloc(sizeof(char*)*(strlen(tok)));
 				// recent_emp = prev_emp_gue;
-			
-				
+				recent_room = malloc(sizeof(char*)*(strlen(prev_room)));
 				strcpy(recent_room,prev_room);
 			
-				
+				recent_arr_dep = malloc(sizeof(char*)*(strlen(prev_arr_dep)));
 				strcpy(recent_arr_dep,prev_arr_dep);	
 			}
 		}
@@ -462,42 +463,45 @@ int parse_cmdline(int argc, char *argv[]) {
 				printf("invalid\n");
 				exit(255);
 			}	
-		}else if(isArr==1&&strcmp("DP",recent_arr_dep)!=0&&strcmp("-",recent_room)!=0){
+		}else if(room_set&&isArr==1&&strcmp("DP",recent_arr_dep)!=0&&strcmp("-",recent_room)!=0){
 			printf("invalid\n");
 			exit(255);				
-		}else if(room!=NULL&&isArr == 1&&strcmp(room,recent_room)==0&&strcmp("DP",recent_arr_dep)!=0){
+		}else if(room_set&&room!=NULL&&isArr == 1&&strcmp(room,recent_room)==0&&strcmp("DP",recent_arr_dep)!=0){
 			printf("invalid\n");
 			exit(255);
-		}else if(room == NULL && isArr == 1&& strcmp("-",recent_room)==0&&strcmp("AV",recent_arr_dep)==0){
+		}else if(room_set&&room == NULL && isArr == 1&& strcmp("-",recent_room)==0&&strcmp("AV",recent_arr_dep)==0){
 			printf("invalid\n");
 			exit(255);
-		}else if(room!=NULL&&isArr == 0&&strcmp("DP",recent_arr_dep)==0&&strcmp(room,recent_room)!=0){
+		}else if(room_set&&room!=NULL&&isArr == 0&&strcmp("DP",recent_arr_dep)==0&&strcmp(room,recent_room)!=0){
 			printf("invalid\n");
 			exit(255);
-		}else if(room!=NULL&&isArr == 0&&strcmp(recent_room,"-")!=0&&strcmp("DP",recent_arr_dep)==0){
+		}else if(room_set&&room!=NULL&&isArr == 0&&strcmp(recent_room,"-")!=0&&strcmp("DP",recent_arr_dep)==0){
 			printf("invalid\n");
 			exit(255);
-		}else if(room == NULL&&strcmp("DP",recent_arr_dep)==0&&strcmp("-",recent_room)==0&&isArr==0){
+		}else if(room_set&&recent_room!=NULL&&recent_arr_dep!=NULL&&room == NULL&&strcmp("DP",recent_arr_dep)==0&&strcmp("-",recent_room)==0&&isArr==0){
 			printf("invalid\n");
 			exit(255);
-		}else if(room != NULL&&strcmp("DP",recent_arr_dep)==0&&strcmp("-",recent_room)==0){
+		}else if(room_set&&room != NULL&&strcmp("DP",recent_arr_dep)==0&&strcmp("-",recent_room)==0){
 			printf("invalid\n");
 			exit(255);
-		}else if(room!=NULL&&isArr == 0&&strcmp(recent_room,room)!=0&&strcmp("AV",recent_arr_dep)==0){
+		}else if(room_set&&room!=NULL&&isArr == 0&&strcmp(recent_room,room)!=0&&strcmp("AV",recent_arr_dep)==0){
 			printf("invalid\n");
 			exit(255);
-		}else if(room == NULL&&isArr == 0&&strcmp("-",recent_room)!=0&&strcmp("AV",recent_arr_dep)==0){
+		}else if(room_set&&room == NULL&&isArr == 0&&strcmp("-",recent_room)!=0&&strcmp("AV",recent_arr_dep)==0){
 			printf("invalid\n");
 			exit(255);
-		}else if(room == NULL&&strcmp("-",recent_room)){
+		}else if(room_set&&room == NULL&&strcmp("-",recent_room)){
 			//printf("leaving gallery");
 			file_write(timestamp,name,logpath,isEmp,isArr,NULL,copy_array,num_lines);
 		}else{
 			file_write(timestamp,name,logpath,isEmp,isArr,room,copy_array,num_lines);
 		}
   		//free(prev_room);
-  		free(recent_room);
-  		free(recent_arr_dep);
+  		if(room_set){
+  			free(recent_room);
+  			free(recent_arr_dep);
+  		}
+  		
   		
   		FILE *fp = fopen(logpath,"r");
   		if(fp==NULL){
