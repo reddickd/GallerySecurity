@@ -312,7 +312,8 @@ int parse_cmdline(int argc, char *argv[]) {
     	char *copy_data = malloc(strlen((char*)out_data));
     	strcpy(copy_data,(char*)out_data);
     	//printf("%s",out_data);
-
+    	EVP_CIPHER_CTX_free(ctx);
+    	
     	//int total_len = out_len1+out_len2;
     	free(i_msg);
     	
@@ -359,16 +360,16 @@ int parse_cmdline(int argc, char *argv[]) {
     	}
 
     	//trims each string
-    	for(a = 0; a < num_lines;a++){
-    		int s = 0;	     		
-    		for(s = 0;s<strlen(new_array[a]);s++){
-    			if('\0'!=new_array[a][s]){
-    				new_array[a][s] = new_array[a][s];
-    			}else{
-    				break;
-    			}
-    		}
-    	}
+    	// for(a = 0; a < num_lines;a++){
+    	// 	int s = 0;	     		
+    	// 	for(s = 0;s<strlen(new_array[a]);s++){
+    	// 		if('\0'!=new_array[a][s]){
+    	// 			new_array[a][s] = new_array[a][s];
+    	// 		}else{
+    	// 			break;
+    	// 		}
+    	// 	}
+    	// }
     	
     	char *copy_array[num_lines];
     	for(a = 0;a<num_lines;a++){
@@ -388,7 +389,7 @@ int parse_cmdline(int argc, char *argv[]) {
 	    	tok = strtok(new_array[a],"|");
 	    	//prev_timestamp = malloc(sizeof(char*)*strlen(tok));
 			prev_timestamp = tok;
-			
+			//printf("%d",a);
 			i++;
 			while(tok != NULL){
 
@@ -430,7 +431,7 @@ int parse_cmdline(int argc, char *argv[]) {
 		//a++;
 	//}
     	
-    	fclose(log);
+    	
 
     	//saving the most recent line in log where the name and employment status matched
     	//in all of the recent_ variables
@@ -505,7 +506,7 @@ int parse_cmdline(int argc, char *argv[]) {
     	out_data[out_len1+out_len2] = '\0';
     	int length = out_len1+out_len2;
     	//EVP_CIPHER_CTX_ctrl(ctx, EVP_CTRL_GCM_GET_TAG,16,tag);
-
+    	EVP_CIPHER_CTX_free(ctx);
    		fp = fopen(logpath,"w+");
    		fwrite(out_data,1,length,fp);
    		//fwrite("\n",1,1,fp);
@@ -545,7 +546,7 @@ int parse_cmdline(int argc, char *argv[]) {
 			out_data[out_len1+out_len2] = '\0';
 			int length = out_len1+out_len2;
 			//EVP_CIPHER_CTX_ctrl(ctx, EVP_CTRL_GCM_GET_TAG,16,tag);
-
+			EVP_CIPHER_CTX_free(ctx);
 			fp = fopen(logpath,"w+");
 			fwrite(out_data,1,length,fp);
 			//fwrite("\n",1,1,fp);
