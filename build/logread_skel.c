@@ -6,8 +6,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <sys/queue.h>
-
+#include <wordexp.h>
+#include <ctype.h>
 #include <openssl/ssl.h>
 #include <openssl/bio.h>
 #include <openssl/err.h>
@@ -21,6 +21,7 @@ int contains(const char *str, char **list, const int num);
 static int myCompare(const void * str1, const void * str2);
 void sort(char *list[], int num);
 static int roomCompare(const void * a, const void * b);
+int is_valid_name(char* name);
 
 struct room {
   int room_num;
@@ -44,7 +45,7 @@ int main(int argc, char *argv[]) {
   unsigned char *ciphertext, *plaintext;
   unsigned char key[16], iv[16];
   int f_size, i_len, o_len1 = 0, o_len2 = 0;
-  EVP_CIPHER_CTX ctx;
+  EVP_CIPHER_CTX *ctx;
   char **all_lines = NULL;
   int line_count = 0, line_index = 0;
 
@@ -57,7 +58,7 @@ int main(int argc, char *argv[]) {
   char **employee_names = NULL, **guest_names = NULL;
   int e_name_count = 0, g_name_count = 0;
 
-  int num_rooms;
+  int num_rooms = 0;
   struct room **all_rooms = NULL;
 
   // all rooms variables
@@ -76,7 +77,16 @@ int main(int argc, char *argv[]) {
     switch(opt) {
       case 'K':
         TOKEN = optarg;
-        // TODO: check token is alphanumeric
+        // check token is alphanumeric
+        for(j=0;j<strlen(TOKEN);j++){
+          if(isalpha(TOKEN[j]) == 0){
+            if (isdigit(TOKEN[j]) == 0) {
+              printf("invalid\n");
+              exit(255);
+            }
+          }
+        }
+
         // check if decrypt works
 
         // create key
@@ -103,6 +113,7 @@ int main(int argc, char *argv[]) {
 
       case 'E':
         NAME = optarg;
+        is_valid_name(NAME);
         is_employee = 1;
         is_guest = 0;
         // printf("employee name: %s\n", NAME);
@@ -110,6 +121,7 @@ int main(int argc, char *argv[]) {
 
       case 'G':
         NAME = optarg;
+        is_valid_name(NAME);
         is_guest = 1;
         is_employee = 0;
         // printf("guest name: %s\n", NAME);
@@ -171,19 +183,20 @@ int main(int argc, char *argv[]) {
 
 
   // Decrypt log file
-  // ctx = EVP_CIPHER_CTX_new();
-  if (!EVP_DecryptInit(&ctx, EVP_aes_256_cbc(), key, iv)) {
+  ctx = EVP_CIPHER_CTX_new();
+  if (!EVP_DecryptInit(ctx, EVP_aes_256_cbc(), key, iv)) {
     printf("integrity violation\n");
     return 255;
   }
-  EVP_DecryptUpdate(&ctx, plaintext, &o_len1, ciphertext, i_len);
-  EVP_DecryptFinal(&ctx, plaintext + o_len1, &o_len2);
+  EVP_DecryptUpdate(ctx, plaintext, &o_len1, ciphertext, i_len);
+  EVP_DecryptFinal(ctx, plaintext + o_len1, &o_len2);
   plaintext[o_len1+o_len2] = '\0';
+  EVP_CIPHER_CTX_free(ctx);
 
   // ::::FOR TESTING::::
-  //printf("%s---\n", plaintext);
+  // printf("%s---\n", plaintext);
 
-  // free(ciphertext);
+  free(ciphertext);
 
   // copy all plaintext lines
   line_count = 0;
@@ -305,6 +318,7 @@ int main(int argc, char *argv[]) {
 
       // get room information
       if (i_room != -1 && (strcmp(i_action, "AV") == 0)) {
+        // printf("arr room %d\n", num_rooms);
         // arriving in a room - add person to the room's list
         if (num_rooms == 0) {
           // first room - initialize array of room structs
@@ -419,10 +433,7 @@ int main(int argc, char *argv[]) {
             }
         }
 
-        // 
-
       }
-
 
     } else if (opt_R == 1) {
       // all rooms line processing
@@ -474,6 +485,7 @@ int main(int argc, char *argv[]) {
 
       // print out employee names
       for (i = 0; i < e_name_count; i++) {
+
         if (i != 0) {
           printf(",");
         }
@@ -506,32 +518,36 @@ int main(int argc, char *argv[]) {
         free(guest_names);
       }
 
-
-      // sort all the rooms
-      qsort(all_rooms, num_rooms, sizeof(struct room *), roomCompare);
-
-      // print out list of rooms
-      for(i = 0; i < num_rooms; i++) {
-        if (all_rooms[i]->num_people > 0) {
-          printf("%d: ", all_rooms[i]->room_num);
-
-          // sort the list of people
-          sort(all_rooms[i]->people, all_rooms[i]->num_people);
-
-          // print out room's people
-          for (j = 0; j < all_rooms[i]->num_people; j++) {
-            if (j != 0) {
-              printf(",");
-            }
-            printf("%s", all_rooms[i]->people[j]);
-          }
-          printf("\n");
-        }
-      }
-
-
-      // free list of rooms and its people
+      // printing rooms
       if (all_rooms != NULL) {
+        // sort all the rooms
+        // printf("sorting rooms #\n");
+        qsort(all_rooms, num_rooms, sizeof(struct room *), roomCompare);
+
+        // printf("printing rooms\n");
+        // print out list of rooms
+        for(i = 0; i < num_rooms; i++) {
+          if (all_rooms[i]->num_people > 0) {
+            printf("%d: ", all_rooms[i]->room_num);
+
+            // sort the list of people
+            sort(all_rooms[i]->people, all_rooms[i]->num_people);
+
+            // print out room's people
+            for (j = 0; j < all_rooms[i]->num_people; j++) {
+              if (j != 0) {
+                printf(",");
+              }
+              printf("%s", all_rooms[i]->people[j]);
+            }
+            printf("\n");
+          }
+        }
+        // printf("printed rooms\n");
+
+        // free list of rooms and its people
+        // printf("freeing rooms\n");
+
         for (i = 0; i < num_rooms; i++) {
           
           // loop through
@@ -547,6 +563,8 @@ int main(int argc, char *argv[]) {
         }
         free(all_rooms);
       }
+      // printf("free'd\n");
+
 
 
     } else if (opt_R == 1) {
@@ -598,4 +616,15 @@ static int roomCompare(const void *a, const void *b) {
   const struct room* roomB = *(struct room **)b;
 
   return (roomA->room_num < roomB->room_num) ? -1 : (roomA->room_num > roomB->room_num);
+}
+
+int is_valid_name(char* name){
+  int j;
+  for(j=0;j<strlen(name);j++){
+    if(isalpha(name[j])==0){
+      printf("invalid\n");
+      exit(255);
+    }
+  }
+  return 0;
 }
