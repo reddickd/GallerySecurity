@@ -433,6 +433,94 @@ int main(int argc, char *argv[]) {
             }
         }
 
+      } else if (i_room == -1 && (strcmp(i_action, "DP") == 0)) {
+        // leaving the gallery
+
+        // remove from names
+        if (strcmp(i_role, "EM") == 0) {
+
+          // check if name is contained in employees
+          if (contains(i_name, employee_names, e_name_count)) {
+
+            for (j = 0; j < e_name_count; j++) {
+              // find matching name
+              if (strcmp(i_name, employee_names[j]) == 0) {
+
+                // remove the name
+                free(employee_names[j]);
+                employee_names[j] = NULL;
+
+                // decrease num of people
+                e_name_count -= 1;
+
+                // printf("removed %s from employee names\n", i_name);
+                break;
+              }
+            }
+
+            // shift down names
+            for (k = j; k < e_name_count; k++) {
+              if (k + 1 <= e_name_count) {
+                // copy name from k + 1 to k
+                employee_names[k] = strdup(employee_names[k + 1]);
+                
+                if (k + 1 == e_name_count) {
+                  // remove free and NULL the the last entry after shifting
+                  free(employee_names[k + 1]);
+                  employee_names[k + 1] = NULL;
+                }
+              }
+            }
+
+          } else {
+            printf("integrity violation\n");
+            return 255;
+          }
+
+        } else if (strcmp(i_role, "GU") == 0) {
+
+          // check if name is contained in guests
+          if (contains(i_name, guest_names, g_name_count)) {
+            
+            for (j = 0; j < g_name_count; j++) {
+              // find matching name
+              if (strcmp(i_name, guest_names[j]) == 0) {
+
+                // remove the name
+                free(guest_names[j]);
+                guest_names[j] = NULL;
+
+                // decrease num of people
+                g_name_count -= 1;
+
+                // printf("removed %s from employee names\n", i_name);
+                break;
+              }
+            }
+
+            // shift down names
+            for (k = j; k < g_name_count; k++) {
+              if (k + 1 <= g_name_count) {
+                // copy name from k + 1 to k
+                guest_names[k] = strdup(guest_names[k + 1]);
+                
+                if (k + 1 == g_name_count) {
+                  // remove free and NULL the the last entry after shifting
+                  free(guest_names[k + 1]);
+                  guest_names[k + 1] = NULL;
+                }
+              }
+            }
+
+          } else {
+            printf("integrity violation\n");
+            return 255;
+          }
+
+        } else {
+          printf("integrity violation\n");
+          return 255;
+        }
       }
 
     } else if (opt_R == 1) {
@@ -540,7 +628,8 @@ int main(int argc, char *argv[]) {
               }
               printf("%s", all_rooms[i]->people[j]);
             }
-            printf("\n");
+            if (i + 1 != num_rooms)
+              printf("\n");
           }
         }
         // printf("printed rooms\n");
