@@ -1,0 +1,13 @@
+{
+	"target_team": 183,
+	"type": "confidentiality",
+	"logfile": "HYZOSUJU",
+  	"commands": 
+  	[
+  		{
+	    	"program": "logread",
+	    	"args": ["-R", "-E", "EVE"],
+	    	"output": "8"
+    	}
+  	]
+}
