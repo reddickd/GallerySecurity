@@ -1,0 +1,13 @@
+{
+	"target_team": 131,
+	"type": "confidentiality",
+	"logfile": "JXRMMAMZ",
+  	"commands": 
+  	[
+  		{
+	    	"program": "logread",
+	    	"args": ["-R", "-G", "DARLA"],
+	    	"output": "4"
+    	}
+  	]
+}
