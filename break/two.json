@@ -1,0 +1,13 @@
+{
+	"target_team": 145,
+	"type": "confidentiality",
+	"logfile": "BAGFDCFG",
+  	"commands": 
+  	[
+  		{
+	    	"program": "logread",
+	    	"args": ["-R", "-G", "LAURETTA"],
+	    	"output": "5"
+    	}
+  	]
+}
