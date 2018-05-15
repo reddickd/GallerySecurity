@@ -1,13 +1,13 @@
 {
 	"target_team": 145,
 	"type": "confidentiality",
-	"logfile": "BAGFDCFG",
+	"logfile": "BBHPVQYH",
   	"commands": 
   	[
   		{
 	    	"program": "logread",
-	    	"args": ["-R", "-G", "LAURETTA"],
-	    	"output": "5"
+	    	"args": ["-R", "-E", "DONOVAN"],
+	    	"output": "2"
     	}
   	]
 }
