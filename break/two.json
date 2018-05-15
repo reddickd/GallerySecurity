@@ -1,0 +1,13 @@
+{
+	"target_team": 145,
+	"type": "confidentiality",
+	"logfile": "BBHPVQYH",
+  	"commands": 
+  	[
+  		{
+	    	"program": "logread",
+	    	"args": ["-R", "-E", "DONOVAN"],
+	    	"output": "2"
+    	}
+  	]
+}
