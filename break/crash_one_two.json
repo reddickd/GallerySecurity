@@ -1,0 +1,11 @@
+{
+  "target_team": 183,
+  "type": "crash",
+  "commands": [
+    {
+      "program": "logappend",
+      "args": ["-K", "secret", "-T", "secretsecretsecretsecretsecretsecretsecretsecretsecretsecretsecretsecretsecretsecretsecretsecretsecret", "-G", "GERDA", "-A", "log"]
+    }
+  ]
+}
+
